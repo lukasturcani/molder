@@ -71,7 +71,7 @@ p {
 
 
 #title_content {
-    color: purple;
+    color: DimGrey;
 
 }
 
@@ -118,18 +118,18 @@ p {
 
 
 #no {
-    background-color: red;
+    background-color: blue;
 
 }
 
 
 #not_sure {
-    background-color: darkorange;
+    background-color: blue;
 
 }
 
 
 #yes {
-    background-color: green;
+    background-color: blue;
 
 }
