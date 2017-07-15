@@ -66,9 +66,10 @@ Files.
 :next_mol.cgi: A server-side Python script. This script is invoked
                every time the user presses a button, excluding
                ``back``. The script saves the molecule and button
-               pressed and sends the user their next molecule.
+               pressed on the server and sends the user their next
+               molecule.
 :previous_mol.cgi: A server-side Python script. Each time the ``back``
                    button is pressed the user sends a request to the
-                   server. The server runs this script  which looks at
-                   the users history and sends them the previous
+                   server. The server runs this script,  which looks at
+                   the user's history, and sends them the previous
                    molecule.
