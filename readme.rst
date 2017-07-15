@@ -68,8 +68,8 @@ Files.
                ``back``. The script saves the molecule and button
                pressed on the server and sends the user their next
                molecule.
-:previous_mol.cgi: A server-side Python script. Each time the ``back``
-                   button is pressed the user sends a request to the
-                   server. The server runs this script,  which looks at
-                   the user's history, and sends them the previous
-                   molecule.
+:get_mol.cgi: A server-side Python script. Each time the ``back``
+              button is pressed the user sends a request to the
+              server. The server runs this script,  which looks at
+              sends back the structural info the molecule the user
+              requested.

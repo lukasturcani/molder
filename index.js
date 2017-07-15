@@ -1,15 +1,21 @@
-/*
+/**
+ *
+ *
+ *
+ */
 
 
-*/
-
-
-/** Prints data returned by a request. */
+/**
+ * Prints data returned by a request.
+ * Used as a callback function for requests.
+ */
 function requestListener() {
     console.log(this.responseText);
 }
 
-
+/**
+ *
+ */
 function updateState() {
     currentMolecule = JSON.parse(this.responseText);
     viewer.loadMoleculeStr(undefined, currentMolecule[1]);
@@ -43,7 +49,7 @@ function getMolecule(molecule) {
     var moleculeRequest = new XMLHttpRequest();
     moleculeRequest.addEventListener("load", requestListener);
     moleculeRequest.addEventListener("load", updateState);
-    moleculeRequest.open("POST", "previous_mol.cgi");
+    moleculeRequest.open("POST", "get_mol.cgi");
     moleculeRequest.send(formData);
 
 }

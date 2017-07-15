@@ -1,4 +1,8 @@
 #!/home/lukas/anaconda3/bin/python3.6
+"""
+Sends user their previous history and first molecule of the session.
+
+"""
 
 import cgi
 import json
