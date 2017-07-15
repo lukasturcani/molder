@@ -1,5 +1,4 @@
 import cgi
-import os
 from os.path import join
 import json
 
@@ -20,10 +19,7 @@ def update_opinions(username, molecule, opinion):
         json.dump(opinions, f)
 
 
-def next_molecule(username):
-    history_file = join(username, 'history.json')
-    with open(history_file, 'r') as f:
-        num_seen = len(json.load(f))
+def next_molecule(username, num_seen):
 
     with open('database.json', 'r') as f:
         db = json.load(f)
@@ -33,10 +29,10 @@ def next_molecule(username):
 
 form = cgi.FieldStorage()
 username = form.getfirst('username')
-history = form.getfirst('history')
+history = json.loads(form.getfirst('history'))
 molecule = form.getfirst('molecule')
-opinion = form.getfirst('opinion')
+opinion = int(form.getfirst('opinion'))
 
 update_history(username, history)
 update_opinions(username, molecule, opinion)
-print(next_molecule(username))
+print(next_molecule(username, len(history)))
