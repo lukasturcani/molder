@@ -12,10 +12,13 @@ server, it looks like this:
 The point is for users to give their opinion on a bunch of molecules
 in a database. Data collected in this way can be used for machine
 learning or in some other way. The number of buttons and question the
-user answer can be changed depending on the task.
+users answer can be changed depending on the task.
 
 Data collection should also work from phones and tablets. The desktop
-version of the site may have to be requested for this to work however.
+version of the site may have to be requested by the user's phone for
+this to work, however.
+
+.. image:: pictures/desktop_request.png
 
 How it works.
 =============
@@ -46,4 +49,4 @@ Files.
                 dictionary where the key is the InChI of the molecule
                 and the value is the structural info of the molecule.
                 The structural info is the content of a V3000 ``.mol``
-                file of the molecule.  
+                file of the molecule. For example
