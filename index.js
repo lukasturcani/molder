@@ -24,7 +24,7 @@ function sendOpinion(molecule, opinion) {
     formData.append("username", username);
     formData.append("molecule", molecule);
     formData.append("opinion", opinion);
-    formData.append("history", history);
+    formData.append("history", previousMolecules);
 
     var opinionRequest = new XMLHttpRequest();
     initRequest.addEventListener("load", requestListener);
@@ -36,7 +36,7 @@ function sendOpinion(molecule, opinion) {
 
 
 function initCallback() {
-    [history, currentMolecule] = JSON.parse(this.responseText);
+    [previousMolecules, currentMolecule] = JSON.parse(this.responseText);
     viewer.loadMoleculeStr(undefined, currentMolecule[1]);
     buttonsOn = true;
 }
@@ -57,7 +57,7 @@ function init() {
 /*** End of function declarations. ***/
 
 
-var viewer, history, currentMolecule;
+var viewer, previousMolecules, currentMolecule;
 var buttonsOn = false;
 var username = prompt("Username");
 
@@ -67,21 +67,21 @@ $(document).ready(function() {
 
     $("#no").on("click touchstart", function() {
         if (buttonsOn) {
-            history.splice(0, 0, currentMolecule[0]);
+            previousMolecules.splice(0, 0, currentMolecule[0]);
             sendOpinion(currentMolecule[0], 0);
         }
     });
 
     $("#not_sure").on("click touchstart", function() {
         if (buttonsOn) {
-            history.splice(0, 0, currentMolecule[0]);
+            previousMolecules.splice(0, 0, currentMolecule[0]);
             sendOpinion(currentMolecule[0], 1);
         }
     });
 
     $("#yes").on("click touchstart", function() {
         if (buttonsOn) {
-            history.splice(0, 0, currentMolecule[0]);
+            previousMolecules.splice(0, 0, currentMolecule[0]);
             sendOpinion(currentMolecule[0], 2);
         }
     });
