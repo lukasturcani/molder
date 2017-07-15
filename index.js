@@ -34,6 +34,20 @@ function sendOpinion(molecule, opinion) {
 }
 
 
+function getMolecule(molecule) {
+    buttonsOn = false;
+
+    var formData = new FormData();
+    formData.append("molecule", molecule);
+
+    var moleculeRequest = new XMLHttpRequest();
+    moleculeRequest.addEventListener("load", requestListener);
+    moleculeRequest.addEventListener("load", updateState);
+    moleculeRequest.open("POST", "previous_mol.cgi");
+    moleculeRequest.send(formData);
+
+}
+
 
 function initCallback() {
     [previousMolecules, currentMolecule] = JSON.parse(this.responseText);
@@ -58,6 +72,7 @@ function init() {
 
 
 var viewer, previousMolecules, currentMolecule;
+var historyIndex = 0;
 var buttonsOn = false;
 var username = prompt("Username");
 
@@ -67,22 +82,38 @@ $(document).ready(function() {
 
     $("#no").on("click touchstart", function() {
         if (buttonsOn) {
-            previousMolecules.splice(0, 0, currentMolecule[0]);
+            if (historyIndex === 0) {
+                previousMolecules.splice(0, 0, currentMolecule[0]);
+            }
+            historyIndex = 0;
             sendOpinion(currentMolecule[0], 0);
         }
     });
 
     $("#not_sure").on("click touchstart", function() {
         if (buttonsOn) {
-            previousMolecules.splice(0, 0, currentMolecule[0]);
+            if (historyIndex === 0) {
+                previousMolecules.splice(0, 0, currentMolecule[0]);
+            }
+            historyIndex = 0;
             sendOpinion(currentMolecule[0], 1);
         }
     });
 
     $("#yes").on("click touchstart", function() {
         if (buttonsOn) {
-            previousMolecules.splice(0, 0, currentMolecule[0]);
+            if (historyIndex === 0) {
+                previousMolecules.splice(0, 0, currentMolecule[0]);
+            }
+            historyIndex = 0;
             sendOpinion(currentMolecule[0], 2);
+        }
+    });
+
+    $("#back").on("click touchstart", function() {
+        if (buttonsOn && historyIndex < previousMolecules.length) {
+            getMolecule(previousMolecules[historyIndex]);
+            historyIndex++;
         }
     });
 
