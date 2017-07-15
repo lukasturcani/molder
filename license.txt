@@ -1,5 +1,5 @@
 This work uses:
-    JQuery
+    jQuery
     GLMol: https://github.com/lukasturcani/GLmol (author's fork),
            https://github.com/biochem-fan/GLmol (original)
 

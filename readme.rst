@@ -20,26 +20,28 @@ this to work, however.
 
 .. image:: pictures/desktop_request.png
 
+
 How it works.
 =============
 
 On loading the website the user is asked to give a username. This
-allows the user to pick up from where they left off on a machine.
-For each user the server creates a folder with the same name. In this
-folder two files are held for each user. The first, ``history.json``,
-stores the InChI keys of molecules previously seen by the user in an
-array. The second, ``opinions.json``, stores the rating the user gave
-to a molecule. The storage is done in a dictionary where the key is the
-InChI of the molecule and value corresponds to the button pressed.
+allows the user to pick up from where they left off on a different
+machine. For each user, the server creates a folder with the same name.
+In this folder two files are held for each user. The first,
+``history.json``, stores the InChI keys of molecules previously seen by
+the user in an array. The second, ``opinions.json``, stores the ratings
+the user gave to molecules. The storage is done in a dictionary where
+the key is the InChI of the molecule and value corresponds to the
+button pressed.
 
-When the user presses a button  a request is sent to the server. The
+When the user presses a button a request is sent to the server. The
 request delivers the molecule and button pressed. A server-side
 Python script, ``next_mol.cgi``, stores this data in ``opinions.json``
 in the user's directory. The script then selects the next molecule in
-``database.json`` to be shown to the user. Modifications to this
-script need to be done if the order or algorithm through which
-molecules are presented to users is to be changed. See the script
-itself for more details.
+``database.json`` to be shown to the user. This script needs to be
+modified if the order or algorithm through which molecules are
+presented to users is to be changed. See the ``next_mol.cgi`` for more
+details.
 
 Files.
 ======
@@ -49,4 +51,24 @@ Files.
                 dictionary where the key is the InChI of the molecule
                 and the value is the structural info of the molecule.
                 The structural info is the content of a V3000 ``.mol``
-                file of the molecule. For example
+                file of the molecule. The content of other molecular
+                structure files may work as well, but they're not
+                tested.
+:index.html: The website.
+:index.css: The styles the website.
+:index.js: Makes the website interactive. Handles communication with
+           the server.
+:init_state.cgi: A server-side Python script. This script is run when
+                 the user first loads the website. It initializes the
+                 session by loading the history of the user (so they
+                 can use the ``back`` button) and sending them the
+                 first molecule of the session.
+:next_mol.cgi: A server-side Python script. This script is invoked
+               every time the user presses a button. The script saves
+               the molecule and button pressed and sends the user their
+               next molecule.
+:previous_mol.cgi: A server-side Python script. Each time the ``back``
+                   button is pressed the user sends a request to the
+                   server. The server runs this script  which looks at
+                   the users history and sends them the previous
+                   molecule.
