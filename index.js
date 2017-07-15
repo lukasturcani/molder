@@ -22,6 +22,7 @@ function sendOpinion(molecule, opinion) {
     var formData = new FormData();
     formData.append("molecule", molecule);
     formData.append("opinion", opinion);
+    formData.append("history", history);
 
     var opinionRequest = new XMLHttpRequest();
     initRequest.addEventListener("load", requestListener);
@@ -64,19 +65,22 @@ $(document).ready(function() {
 
     $("#no").on("click touchstart", function() {
         if (buttonsOn) {
-            sendOpinion(currentMolecule[0], 0);;
+            history.splice(0, 0, currentMolecule[0]);
+            sendOpinion(currentMolecule[0], 0);
         }
     });
 
     $("#not_sure").on("click touchstart", function() {
         if (buttonsOn) {
-            sendOpinion(currentMolecule[0], 1);;
+            history.splice(0, 0, currentMolecule[0]);
+            sendOpinion(currentMolecule[0], 1);
         }
     });
 
     $("#yes").on("click touchstart", function() {
         if (buttonsOn) {
-            sendOpinion(currentMolecule[0], 2);;
+            history.splice(0, 0, currentMolecule[0]);
+            sendOpinion(currentMolecule[0], 2);
         }
     });
 
