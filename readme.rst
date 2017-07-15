@@ -55,18 +55,18 @@ Files.
                 structure files may work as well, but they're not
                 tested.
 :index.html: The website.
-:index.css: The styles the website.
+:index.css: Styles the website.
 :index.js: Makes the website interactive. Handles communication with
            the server.
 :init_state.cgi: A server-side Python script. This script is run when
                  the user first loads the website. It initializes the
                  session by loading the history of the user (so they
-                 can use the ``back`` button) and sending them the
+                 can use the ``back`` button) and sends them their
                  first molecule of the session.
 :next_mol.cgi: A server-side Python script. This script is invoked
-               every time the user presses a button. The script saves
-               the molecule and button pressed and sends the user their
-               next molecule.
+               every time the user presses a button, excluding
+               ``back``. The script saves the molecule and button
+               pressed and sends the user their next molecule.
 :previous_mol.cgi: A server-side Python script. Each time the ``back``
                    button is pressed the user sends a request to the
                    server. The server runs this script  which looks at
