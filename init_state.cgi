@@ -22,7 +22,7 @@ if os.path.exists(username):
 
 # If this is a new user.
 else:
-    history = ['a string']
+    history = []
     next_mol = sorted(db.items())[0]
     os.mkdir(username)
     with open(os.path.join(username, 'history.json'), 'w') as f:
