@@ -9,6 +9,9 @@ server, it looks like this:
 
 .. image:: pictures/molder.png
 
+Note that the website shows an interactive 3D rendering of the
+molecule and not a 2D picture.
+
 The point is for users to give their opinion on a bunch of molecules
 in a database. Data collected in this way can be used for machine
 learning or in some other way. The number of buttons and question the

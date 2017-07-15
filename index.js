@@ -1,12 +1,31 @@
 /**
+ * Adds interactivity to the website.
  *
+ * There are a couple of globals which determine the state.
  *
+ * previousMolecules - array of strings - Each string is the InChI of a
+ * molecule previously seen by the user. Most recent first.
  *
+ * currentMolecule - array of 2 strings - The first string is the
+ * InChI of the molecule currently being viewed. The second string is
+ * its structure. The structure is represented using the V3000 .mol
+ * file format.
+ *
+ * historyIndex - int - Keeps track of how many times the user pressed
+ * ``back`` button in a row. Reset to 0 every time one of the other
+ * buttones is pressed.
+ *
+ * buttonsOn - bool - A switch which prevents buttons from sending
+ * multiple requests to the server. Causes the buttons to stop
+ * sending requests until a response is received.
+ *
+ * username - str - The username of the user.
  */
 
 
 /**
  * Prints data returned by a request.
+ *
  * Used as a callback function for requests.
  */
 function requestListener() {
@@ -14,16 +33,29 @@ function requestListener() {
 }
 
 /**
+ * A callback function for ``sendOpinion`` and ``getMolecule``.
  *
+ * When the server sends back the structure of the next molecule to be
+ * rendered, this function is run. It updates ``currentMolecule`` and
+ * renders the new molecule.
  */
 function updateState() {
     currentMolecule = JSON.parse(this.responseText);
     viewer.loadMoleculeStr(undefined, currentMolecule[1]);
+    // Allow new requests to be sent.
     buttonsOn = true;
 }
 
 
+/**
+ * Communicates with the server when a button is pressed, excluding ``back``.
+ *
+ * Tells the server the username, molecule, button pressed and
+ * previously seen molecules. Creates a callback for when the user
+ * sends back the next molecule to render.
+ */
 function sendOpinion(molecule, opinion) {
+    // Don't allow any new requests until this one is complete.
     buttonsOn = false;
 
     var formData = new FormData();
@@ -40,7 +72,14 @@ function sendOpinion(molecule, opinion) {
 }
 
 
+/**
+ * Communicates with the server when the ``back`` button is pressed.
+ *
+ * Tells the server the InChI of one of the previous molecules and
+ * asks it to return its structure, which is rendered by the callback.
+ */
 function getMolecule(molecule) {
+    // Don't allow any new requests until this one is complete.
     buttonsOn = false;
 
     var formData = new FormData();
@@ -55,13 +94,26 @@ function getMolecule(molecule) {
 }
 
 
+/**
+ * A callback for the ``init`` function.
+ *
+ * When the server returns the molecules previously seen by the user
+ * and the molecule which should be rendered, this function saves the
+ * data and renders the molecule.
+ */
 function initCallback() {
     [previousMolecules, currentMolecule] = JSON.parse(this.responseText);
     viewer.loadMoleculeStr(undefined, currentMolecule[1]);
+    // Allow requests to be sent to the server.
     buttonsOn = true;
 }
 
 
+/**
+ * Asks the server to return any molecules previously seen by the user.
+ *
+ * Also asks it for the first molecule to be viewed in this session.
+ */
 function init() {
     var formData = new FormData();
     formData.append("username", username);
