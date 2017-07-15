@@ -42,4 +42,8 @@ Files.
 ======
 
 :database.json: Holds the database of molecules which are to be
-                evaluated by users.
+                evaluated by users. The molecules are stored as a
+                dictionary where the key is the InChI of the molecule
+                and the value is the structural info of the molecule.
+                The structural info is the content of a V3000 ``.mol``
+                file of the molecule.  
