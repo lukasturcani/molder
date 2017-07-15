@@ -42,4 +42,4 @@ Files.
 ======
 
 :database.json: Holds the database of molecules which are to be
-evaluated by users.
+                evaluated by users.
