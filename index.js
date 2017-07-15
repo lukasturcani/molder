@@ -24,13 +24,13 @@ function sendOpinion(molecule, opinion) {
     formData.append("username", username);
     formData.append("molecule", molecule);
     formData.append("opinion", opinion);
-    formData.append("history", previousMolecules);
+    formData.append("history", JSON.stringify(previousMolecules));
 
     var opinionRequest = new XMLHttpRequest();
-    initRequest.addEventListener("load", requestListener);
-    initRequest.addEventListener("load", updateState);
-    initRequest.open("POST", "next_mol.cgi");
-    initRequest.send(formData);
+    opinionRequest.addEventListener("load", requestListener);
+    opinionRequest.addEventListener("load", updateState);
+    opinionRequest.open("POST", "next_mol.cgi");
+    opinionRequest.send(formData);
 }
 
 

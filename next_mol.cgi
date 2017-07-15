@@ -1,3 +1,5 @@
+#!/home/lukas/anaconda3/bin/python3.6
+
 import cgi
 from os.path import join
 import json
@@ -35,4 +37,4 @@ opinion = int(form.getfirst('opinion'))
 
 update_history(username, history)
 update_opinions(username, molecule, opinion)
-print(next_molecule(username, len(history)))
+print(json.dumps(next_molecule(username, len(history))))
