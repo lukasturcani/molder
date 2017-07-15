@@ -11,7 +11,8 @@ function requestListener() {
 
 
 function updateState() {
-
+    currentMolecule = JSON.parse(this.responseText);
+    viewer.loadMoleculeStr(undefined, currentMolecule[1]);
     buttonsOn = true;
 }
 
@@ -20,6 +21,7 @@ function sendOpinion(molecule, opinion) {
     buttonsOn = false;
 
     var formData = new FormData();
+    formData.append("username", username);
     formData.append("molecule", molecule);
     formData.append("opinion", opinion);
     formData.append("history", history);
