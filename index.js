@@ -116,7 +116,7 @@ function initCallback() {
  */
 function init() {
     var formData = new FormData();
-    formData.append("username (anything)", username);
+    formData.append("username", username);
 
     var initRequest = new XMLHttpRequest();
     initRequest.addEventListener("load", requestListener);
@@ -132,7 +132,7 @@ function init() {
 var viewer, previousMolecules, currentMolecule;
 var historyIndex = 0;
 var buttonsOn = false;
-var username = prompt("Username");
+var username = prompt("Username (can be anything)");
 
 $(document).ready(function() {
     viewer = new GLmol("viewer", true);
