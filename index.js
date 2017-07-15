@@ -116,7 +116,7 @@ function initCallback() {
  */
 function init() {
     var formData = new FormData();
-    formData.append("username", username);
+    formData.append("username (anything)", username);
 
     var initRequest = new XMLHttpRequest();
     initRequest.addEventListener("load", requestListener);
