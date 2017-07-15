@@ -38,7 +38,9 @@ function init() {
     initRequest.send(formData);
 }
 
-console.log('hi');
+
+/*** End of function declarations. ***/
+
 
 var viewer, history, currentMolecule;
 var username = prompt('Username');
