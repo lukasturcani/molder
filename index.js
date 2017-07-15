@@ -51,7 +51,7 @@ function updateState() {
  * Communicates with the server when a button is pressed, excluding ``back``.
  *
  * Tells the server the username, molecule, button pressed and
- * previously seen molecules. Creates a callback for when the user
+ * previously seen molecules. Creates a callback for when the server
  * sends back the next molecule to render.
  */
 function sendOpinion(molecule, opinion) {
