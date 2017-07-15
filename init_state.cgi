@@ -4,9 +4,10 @@ import cgi
 import json
 import os
 
+print('Content-Type: text/plain\n')
+
 form = cgi.FieldStorage()
 username = form.getfirst('username')
-print('Content-Type: text/plain\n')
 
 with open('database.json', 'r') as f:
     db = json.load(f)

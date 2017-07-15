@@ -63,27 +63,21 @@ $(document).ready(function() {
     init();
 
     $("#no").on("click touchstart", function() {
-        // Don't do anything if buttons are not on.
-        if (!buttonsOn) {
-            return;
+        if (buttonsOn) {
+            sendOpinion(currentMolecule[0], 0);;
         }
-        sendOpinion(currentMolecule[0], 0);
     });
 
     $("#not_sure").on("click touchstart", function() {
-        // Don't do anything if buttons are not on.
-        if (!buttonsOn) {
-            return;
+        if (buttonsOn) {
+            sendOpinion(currentMolecule[0], 1);;
         }
-        sendOpinion(currentMolecule[0], 1);
     });
 
     $("#yes").on("click touchstart", function() {
-        // Don't do anything if buttons are not on.
-        if (!buttonsOn) {
-            return;
+        if (buttonsOn) {
+            sendOpinion(currentMolecule[0], 2);;
         }
-        sendOpinion(currentMolecule[0], 2);
     });
 
     /** Make buttons change colour on mouseover. */
