@@ -1,7 +1,6 @@
 #!/home/lukas/anaconda3/bin/python3.6
 
 import cgi
-from os.path import join
 import json
 
 print('Content-Type: text/plain\n')
