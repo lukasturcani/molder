@@ -97,6 +97,15 @@ def next_molecule(username, num_seen):
     with open('database.json', 'r') as f:
         db = json.load(f)
 
+    # If all of the shared molecules have been evaluated, try loading
+    # the user-specific molecules.
+    if len(db.keys()) >= num_seen:
+        num_seen -= len(db.keys())
+
+        with open(username+'.json', 'r') as f:
+            db = json.load(f)
+            
+
     # Go through the database in order.
     return sorted(db.items())[num_seen]
 

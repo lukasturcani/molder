@@ -148,23 +148,13 @@ $(document).ready(function() {
         }
     });
 
-    $("#not_sure").on("click touchstart", function() {
-        if (buttonsOn) {
-            if (historyIndex === 0) {
-                previousMolecules.splice(0, 0, currentMolecule[0]);
-            }
-            historyIndex = 0;
-            sendOpinion(currentMolecule[0], 1);
-        }
-    });
-
     $("#yes").on("click touchstart", function() {
         if (buttonsOn) {
             if (historyIndex === 0) {
                 previousMolecules.splice(0, 0, currentMolecule[0]);
             }
             historyIndex = 0;
-            sendOpinion(currentMolecule[0], 2);
+            sendOpinion(currentMolecule[0], 1);
         }
     });
 

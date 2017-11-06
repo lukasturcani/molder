@@ -46,6 +46,16 @@ modified if the order or algorithm through which molecules are
 presented to users is to be changed. See the ``next_mol.cgi`` for more
 details.
 
+Finally, it is also possible to provide specific users with unique
+molecules. The molecules in ``database.json`` are shown first and to
+all users. However, once all these molecules have been responded to, a
+database ``username.json`` is searched for. Here ``username`` will
+correspond to the username the user entered when logging into the site.
+The user will then view molecules in ``username.json``. These molecules
+will only be viewed if the name of the database and the user are the
+same.
+
+
 Files.
 ======
 
