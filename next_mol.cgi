@@ -15,8 +15,8 @@ as necessary for the chosen algo.
 import cgi
 from os.path import join
 import json
-from glob import iglob
 import numpy as np
+from glob import iglob
 
 
 def update_history(username, history):
