@@ -1,4 +1,4 @@
-#!/home/lukas/anaconda3/bin/python3.6
+#!/usr/bin/python2.7
 """
 Sends user their previous history and first molecule of the session.
 
@@ -8,7 +8,7 @@ import cgi
 import json
 import os
 
-print('Content-Type: text/plain\n')
+print 'Content-Type: text/plain\n'
 
 form = cgi.FieldStorage()
 username = form.getfirst('username')
@@ -34,4 +34,4 @@ else:
     with open(os.path.join(username, 'opinions.json'), 'w') as f:
         json.dump({}, f)
 
-print(json.dumps((history, next_mol)))
+print json.dumps((history, next_mol))

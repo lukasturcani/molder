@@ -1,4 +1,4 @@
-#!/home/lukas/anaconda3/bin/python3.6
+#!/usr/bin/python2.7
 """
 Returns the structural info of a molecule to the client.
 
@@ -7,7 +7,7 @@ Returns the structural info of a molecule to the client.
 import cgi
 import json
 
-print('Content-Type: text/plain\n')
+print 'Content-Type: text/plain\n'
 
 
 def get_molecule(molecule):
@@ -37,4 +37,4 @@ def get_molecule(molecule):
 
 form = cgi.FieldStorage()
 molecule = form.getfirst('molecule')
-print(json.dumps(get_molecule(molecule)))
+print json.dumps(get_molecule(molecule))

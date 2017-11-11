@@ -46,14 +46,11 @@ modified if the order or algorithm through which molecules are
 presented to users is to be changed. See the ``next_mol.cgi`` for more
 details.
 
-Finally, it is also possible to provide specific users with unique
-molecules. The molecules in ``database.json`` are shown first and to
-all users. However, once all these molecules have been responded to, a
-database ``username.json`` is searched for. Here ``username`` will
-correspond to the username the user entered when logging into the site.
-The user will then view molecules in ``username.json``. These molecules
-will only be viewed if the name of the database and the user are the
-same.
+By default, different users will not see the same molecules from
+``database.json``. To make a set of molecules seen by all users,
+create a file called ``shared.json``. It will hold a ``.json`` list of
+InChI's belonging to molecules in ``database.json``. These molecules
+will be seen by all users.
 
 
 Files.
@@ -67,6 +64,9 @@ Files.
                 file of the molecule. The content of other molecular
                 structure files may work as well, but they're not
                 tested.
+:shared.json: Holds a list of InChIs belonging to molecules in
+              ``database.json``. Molecules in this list will be seen
+              by all users.
 :index.html: The website.
 :index.css: Styles the website.
 :index.js: Makes the website interactive. Handles communication with

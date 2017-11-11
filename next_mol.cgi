@@ -1,4 +1,4 @@
-#!/home/lukas/anaconda3/bin/python3.6
+#!/usr/bin/python2.7
 """
 Saves data from client and sends back the next molecule.
 
@@ -15,8 +15,11 @@ as necessary for the chosen algo.
 import cgi
 from os.path import join
 import json
+from glob import iglob
+import numpy as np
 
-print('Content-Type: text/plain\n')
+
+print 'Content-Type: text/plain\n'
 
 
 def update_history(username, history):
@@ -73,7 +76,7 @@ def update_opinions(username, molecule, opinion):
         json.dump(opinions, f)
 
 
-def next_molecule(username, num_seen):
+def next_molecule(username):
     """
     Returns the next molecule to be judged by the user.
 
@@ -81,9 +84,6 @@ def next_molecule(username, num_seen):
     ----------
     username : :class:`str`
         The username of the person sending the request.
-
-    num_seen : :class:`int`
-        The number of molecules the user has seen previously.
 
     Returns
     -------
@@ -94,20 +94,32 @@ def next_molecule(username, num_seen):
 
     """
 
+    # Load the set of shared molecules that every user sees.
+    with open('shared.json', 'r') as f:
+        shared = set(json.load(f))
+
+    # Make a set of all molecules judged by all users. This will
+    # ensure that each user looks at unique molecules.
+    seen = set()
+    for path in iglob('*/history.json'):
+        with open(path, 'r') as f:
+            history = json.load(f)
+            # If looking at the molecules judges by other users, ignore
+            # the fact that they've already looked at shared molecules.
+            if username not in path:
+                history = (mol for mol in history if mol not in shared)
+            seen.update(history)
+
+    # Load molecules in the database, excluding the ones already seen.
     with open('database.json', 'r') as f:
         db = json.load(f)
+        db = {key: value for key, value in db.items() if
+              key not in seen}
 
-    # If all of the shared molecules have been evaluated, try loading
-    # the user-specific molecules.
-    if len(db.keys()) <= num_seen:
-        num_seen -= len(db.keys())
-
-        with open(username+'.json', 'r') as f:
-            db = json.load(f)
-
-
+    # Pick the next molecule at random from the available ones.
+    chosen_key = np.random.choice(list(db.keys()))
     # Go through the database in order.
-    return sorted(db.items())[num_seen]
+    return chosen_key, db[chosen_key]
 
 
 form = cgi.FieldStorage()
@@ -118,4 +130,4 @@ opinion = int(form.getfirst('opinion'))
 
 update_history(username, history)
 update_opinions(username, molecule, opinion)
-print(json.dumps(next_molecule(username, len(history))))
+print json.dumps(next_molecule(username))
