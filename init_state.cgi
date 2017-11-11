@@ -14,7 +14,7 @@ if __name__ == '__main__':
     gvars = {}
     with open('next_mol.cgi', 'r') as f:
         exec f.read() in gvars
-    next_molecule = lvars['next_molecule']
+    next_molecule = gvars['next_molecule']
 
     form = cgi.FieldStorage()
     username = form.getfirst('username')
