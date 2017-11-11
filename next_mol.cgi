@@ -79,16 +79,19 @@ def update_opinions(username, molecule, opinion):
 def next_molecule(username):
     """
     Returns the next molecule to be judged by the user.
+
     Parameters
     ----------
     username : :class:`str`
         The username of the person sending the request.
+
     Returns
     -------
     :class:`tuple` of :class:`str`
         The first string is InChI of the next molecule the client will
         render. The second string is the structural info of the
         molecule.
+
     """
 
     # Load the set of shared molecules that every user sees.
