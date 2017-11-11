@@ -32,6 +32,7 @@ def get_molecule(molecule):
 
     return molecule, db[molecule]
 
+
 if __name__ == '__main__':
     form = cgi.FieldStorage()
     molecule = form.getfirst('molecule')
