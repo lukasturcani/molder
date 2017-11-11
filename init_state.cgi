@@ -12,7 +12,7 @@ import os
 if __name__ == '__main__':
     # Import "next_molecule" from next_mol.cgi.
     gvars, lvars = {}, {}
-    with open('get_mol.cgi', 'r') as f:
+    with open('next_mol.cgi', 'r') as f:
         exec f.read() in gvars, lvars
     next_molecule = lvars['next_molecule']
 
