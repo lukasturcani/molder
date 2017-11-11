@@ -11,9 +11,9 @@ import os
 
 if __name__ == '__main__':
     # Import "next_molecule" from next_mol.cgi.
-    gvars, lvars = {}, {}
+    gvars = {}
     with open('next_mol.cgi', 'r') as f:
-        exec f.read() in gvars, lvars
+        exec f.read() in gvars
     next_molecule = lvars['next_molecule']
 
     form = cgi.FieldStorage()
