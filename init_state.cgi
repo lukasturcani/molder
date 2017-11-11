@@ -26,14 +26,12 @@ if __name__ == '__main__':
     if os.path.exists(username):
         with open(os.path.join(username, 'history.json'), 'r') as f:
             history = json.load(f)
-
-        num_seen = len(history)
-        next_mol = sorted(db.items())[num_seen]
+        next_mol = next_molecule(username)
 
     # If this is a new user.
     else:
         history = []
-        next_mol = sorted(db.items())[0]
+        next_mol = next_molecule(username)
         os.mkdir(username)
         with open(os.path.join(username, 'history.json'), 'w') as f:
             json.dump(history, f)
