@@ -7,8 +7,6 @@ Returns the structural info of a molecule to the client.
 import cgi
 import json
 
-print('Content-Type: text/plain\n')
-
 
 def get_molecule(molecule):
     """
@@ -35,6 +33,9 @@ def get_molecule(molecule):
     return molecule, db[molecule]
 
 
-form = cgi.FieldStorage()
-molecule = form.getfirst('molecule')
-print(json.dumps(get_molecule(molecule)))
+if __name__ == '__main__':
+    form = cgi.FieldStorage()
+    molecule = form.getfirst('molecule')
+
+    print('Content-Type: text/plain\n')
+    print(json.dumps(get_molecule(molecule)))
