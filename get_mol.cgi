@@ -36,5 +36,5 @@ if __name__ == '__main__':
     form = cgi.FieldStorage()
     molecule = form.getfirst('molecule')
 
-    print json.dumps(get_molecule(molecule))
     print 'Content-Type: text/plain\n'
+    print json.dumps(get_molecule(molecule))
