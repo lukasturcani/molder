@@ -19,9 +19,6 @@ from glob import iglob
 import numpy as np
 
 
-print 'Content-Type: text/plain\n'
-
-
 def update_history(username, history):
     """
     Writes `history` to the user's ``history.json`` file.
@@ -122,12 +119,15 @@ def next_molecule(username):
     return chosen_key, db[chosen_key]
 
 
-form = cgi.FieldStorage()
-username = form.getfirst('username')
-history = json.loads(form.getfirst('history'))
-molecule = form.getfirst('molecule')
-opinion = int(form.getfirst('opinion'))
+if __name__ == '__main__':
+    form = cgi.FieldStorage()
+    username = form.getfirst('username')
+    history = json.loads(form.getfirst('history'))
+    molecule = form.getfirst('molecule')
+    opinion = int(form.getfirst('opinion'))
 
-update_history(username, history)
-update_opinions(username, molecule, opinion)
-print json.dumps(next_molecule(username))
+    update_history(username, history)
+    update_opinions(username, molecule, opinion)
+
+    print 'Content-Type: text/plain\n'
+    print json.dumps(next_molecule(username))
