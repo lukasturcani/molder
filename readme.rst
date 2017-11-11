@@ -86,3 +86,5 @@ Files.
               server. The server runs this script,  which looks at
               sends back the structural info the molecule the user
               requested.
+:colors.html: Gives the name of each element and the corresponding
+              color.
