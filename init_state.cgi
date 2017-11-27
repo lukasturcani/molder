@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 if __name__ == '__main__':
-    logging.basicConfig(filename='log', filemode='w', level=1000)
+    logging.basicConfig(filename='log', filemode='w', level=0)
 
     # Import "next_molecule" from next_mol.cgi.
     logger.debug('Importing "next_mol.cgi".')
