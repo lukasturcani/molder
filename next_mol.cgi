@@ -17,6 +17,10 @@ from os.path import join
 import json
 import numpy as np
 from glob import iglob
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(filename='log', level=0)
 
 
 def update_history(username, history):
@@ -92,47 +96,57 @@ def next_molecule(username):
     """
 
     # Load the set of shared molecules that every user sees.
+    logger.debug('Opening "shared.json".')
     with open('shared.json', 'r') as f:
         shared = set(json.load(f))
 
     # Load the database.
     # Load molecules in the database, excluding the ones already seen.
+    logger.debug('Opening "database.json".')
     with open('database.json', 'r') as f:
         db = json.load(f)
 
     # Make a set of all molecules previously judged by the user.
+    logger.debug('Creating set of molecules seen by the user.')
     user_seen = set()
     with open(join(username, 'history.json'), 'r') as f:
         user_history = json.load(f)
         user_seen.update(user_history)
 
     # Get all shared molecules which the user has not seen.
+    logger.debug('Checking which shared molecules are left.')
     remaining_shared = shared - user_seen
 
     # If there are shared molecules left for the user to judge, go
     # through those first.
     if remaining_shared:
+        logger.debug('Picking random shared molecule.')
         chosen_key = np.random.choice(list(remaining_shared))
+        logger.debug('Returning.')
         return chosen_key, db[chosen_key]
 
     # Make a set of all molecules judged by all users. This will
     # ensure that each user looks at unique molecules.
+    logger.debug('Creating set of all seen molecules.')
     seen = set()
     for path in iglob('*/history.json'):
         with open(path, 'r') as f:
             history = json.load(f)
-            # If looking at the molecules judges by other users, ignore
+            # If looking at the molecules judged by other users, ignore
             # the fact that they've already looked at shared molecules.
             if username not in path:
                 history = (mol for mol in history if mol not in shared)
             seen.update(history)
 
     # Remove seen molecules from the database.
+    logger.debug('Removing seen molecule from database.')
     db = {key: value for key, value in db.items() if key not in seen}
 
     # Pick the next molecule at random from the available ones.
+    logger.debug('Picking random molecule from database.')
     chosen_key = np.random.choice(list(db.keys()))
     # Go through the database in order.
+    logger.debug('Returning.')
     return chosen_key, db[chosen_key]
 
 
