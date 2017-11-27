@@ -145,7 +145,7 @@ def next_molecule(username):
     logger.debug('Picking random molecule from database.')
     chosen_key = np.random.choice(list(db.keys()))
     # Go through the database in order.
-    logger.debug('Returning.\n{}\n{}'.format(chosen_key, db[chosen_key]))
+    logger.debug('Returning.\n{}'.format(chosen_key))
     return chosen_key, db[chosen_key]
 
 
