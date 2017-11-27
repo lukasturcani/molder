@@ -138,7 +138,7 @@ def next_molecule(username):
             seen.update(history)
 
     # Remove seen molecules from the database.
-    logger.debug('Removing seen molecule from database.')
+    logger.debug('Removing seen molecules from database.')
     db = {key: value for key, value in db.items() if key not in seen}
 
     # Pick the next molecule at random from the available ones.
