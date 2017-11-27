@@ -95,6 +95,26 @@ def next_molecule(username):
     with open('shared.json', 'r') as f:
         shared = set(json.load(f))
 
+    # Load the database.
+    # Load molecules in the database, excluding the ones already seen.
+    with open('database.json', 'r') as f:
+        db = json.load(f)
+
+    # Make a set of all molecules previously judged by the user.
+    user_seen = set()
+    with open(join(username, 'history.json'), 'r') as f:
+        user_history = json.load(f)
+        user_seen.update(user_history)
+
+    # Get all shared molecules which the user has not seen.
+    remaining_shared = shared - user_seen
+
+    # If there are shared molecules left for the user to judge, go
+    # through those first.
+    if remaining_shared:
+        chosen_key = np.random.choice(list(remaining_shared))
+        return chosen_key, db[chosen_key]
+
     # Make a set of all molecules judged by all users. This will
     # ensure that each user looks at unique molecules.
     seen = set()
@@ -107,11 +127,8 @@ def next_molecule(username):
                 history = (mol for mol in history if mol not in shared)
             seen.update(history)
 
-    # Load molecules in the database, excluding the ones already seen.
-    with open('database.json', 'r') as f:
-        db = json.load(f)
-        db = {key: value for key, value in db.items() if
-              key not in seen}
+    # Remove seen molecules from the database.
+    db = {key: value for key, value in db.items() if key not in seen}
 
     # Pick the next molecule at random from the available ones.
     chosen_key = np.random.choice(list(db.keys()))
