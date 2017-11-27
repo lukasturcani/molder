@@ -47,11 +47,11 @@ GLmol.prototype.create = function(id, suppressAutoload) {
    this.Nucleotides = ['  G', '  A', '  T', '  C', '  U', ' DG', ' DA', ' DT', ' DC', ' DU'];
    this.ElementColors = {"H": 0xFFFFFF, "C": 0x808080, "O": 0xCC0000, "N": 0x0000CC, "S": 0xCCCC00, "P": 0xCCBADC,
                          "F": 0x00CC00, "CL": 0xADD8E6, "BR": 0x882200, "I": 0x551A8B,
-                         "FE": 0xCC6600, "CA": 0x8888AA};
+                         "FE": 0xCC6600, "CA": 0x8888AA, "B": 0xBC8F8F};
 // Reference: A. Bondi, J. Phys. Chem., 1964, 68, 441.
    this.vdwRadii = {"H": 1.2, "LI": 1.82, "NA": 2.27, "K": 2.75, "C": 1.7, "N": 1.55, "O": 1.52,
                    "F": 1.47, "P": 1.80, "S": 1.80, "CL": 1.75, "BR": 1.85, "SE": 1.90,
-                   "ZN": 1.39, "CU": 1.4, "NI": 1.63, "I": 1.98};
+                   "ZN": 1.39, "CU": 1.4, "NI": 1.63, "I": 1.98, "B": 1.8};
 
    this.id = id;
    this.aaScale = 1; // or 2
