@@ -20,7 +20,6 @@ from glob import iglob
 import logging
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(filename='log', level=0)
 
 
 def update_history(username, history):
@@ -156,6 +155,10 @@ if __name__ == '__main__':
     history = json.loads(form.getfirst('history'))
     molecule = form.getfirst('molecule')
     opinion = int(form.getfirst('opinion'))
+
+    logging.basicConfig(filename=join(username, 'log'),
+                        filemode='w',
+                        level=0)
 
     update_history(username, history)
     update_opinions(username, molecule, opinion)
