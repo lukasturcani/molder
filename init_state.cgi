@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 if __name__ == '__main__':
-    logging.basicConfig(filename='log', filemode='w', level=0)
+    logging.basicConfig(filename='log', filemode='w', level=1000)
 
     # Import "next_molecule" from next_mol.cgi.
     logger.debug('Importing "next_mol.cgi".')
@@ -41,12 +41,12 @@ if __name__ == '__main__':
     else:
         logger.debug('Setting up new user.')
         history = []
-        next_mol = next_molecule(username)
         os.mkdir(username)
         with open(os.path.join(username, 'history.json'), 'w') as f:
             json.dump(history, f)
         with open(os.path.join(username, 'opinions.json'), 'w') as f:
             json.dump({}, f)
+        next_mol = next_molecule(username)
 
     print 'Content-Type: text/plain\n'
     print json.dumps((history, next_mol))

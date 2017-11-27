@@ -158,7 +158,7 @@ if __name__ == '__main__':
 
     logging.basicConfig(filename=join(username, 'log'),
                         filemode='w',
-                        level=0)
+                        level=1000)
 
     update_history(username, history)
     update_opinions(username, molecule, opinion)
