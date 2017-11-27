@@ -121,7 +121,7 @@ def next_molecule(username):
     if remaining_shared:
         logger.debug('Picking random shared molecule.')
         chosen_key = np.random.choice(list(remaining_shared))
-        logger.debug('Returning.\n{}\n{}'.format(chosen_key, db[chosen_key]))
+        logger.debug('Returning.\n{}'.format(chosen_key))
         return chosen_key, db[chosen_key]
 
     # Make a set of all molecules judged by all users. This will
