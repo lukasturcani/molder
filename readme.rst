@@ -59,7 +59,8 @@ Files.
 :database.json: Holds the database of molecules which are to be
                 evaluated by users. The molecules are stored as a
                 dictionary where the key is the InChI of the molecule
-                and the value is the structural info of the molecule.
+                and the value is a list holding the strucutre of the cage,
+                and its two building blocks.
                 The structural info is the content of a V3000 ``.mol``
                 file of the molecule. The content of other molecular
                 structure files may work as well, but they're not

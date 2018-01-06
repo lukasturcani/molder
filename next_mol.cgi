@@ -116,7 +116,7 @@ def next_molecule(username):
     # Pick the next molecule at random from the available ones.
     chosen_key = np.random.choice(list(db.keys()))
     # Go through the database in order.
-    return chosen_key, db[chosen_key]
+    return chosen_key, db[chosen_key][0]
 
 
 if __name__ == '__main__':
