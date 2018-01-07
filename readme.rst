@@ -44,7 +44,8 @@ in the user's directory. The script then selects the next molecule in
 ``database.json`` to be shown to the user. This script needs to be
 modified if the order or algorithm through which molecules are
 presented to users is to be changed. See the ``next_mol.cgi`` for more
-details.
+details. Note that users can also press buttons ``1``, ``2`` etc. to
+select the appropriate button.
 
 By default, different users will not see the same molecules from
 ``database.json``. To make a set of molecules seen by all users,

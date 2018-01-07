@@ -138,6 +138,35 @@ $(document).ready(function() {
     viewer = new GLmol("viewer", true);
     init();
 
+    /** Make pressing on the keyboard work. **/
+
+    $(document).keydown(function(key) {
+        if (key.which === 49) {
+
+            if (buttonsOn) {
+                if (historyIndex === 0) {
+                    previousMolecules.splice(0, 0, currentMolecule[0]);
+                }
+                historyIndex = 0;
+                sendOpinion(currentMolecule[0], 0);
+            }
+        }
+
+        if (key.which === 50) {
+
+            if (buttonsOn) {
+                if (historyIndex === 0) {
+                    previousMolecules.splice(0, 0, currentMolecule[0]);
+                }
+                historyIndex = 0;
+                sendOpinion(currentMolecule[0], 1);
+            }
+        }
+
+    });
+
+    /** Make clicking on buttons work. **/
+
     $("#no").on("click touchstart", function() {
         if (buttonsOn) {
             if (historyIndex === 0) {
