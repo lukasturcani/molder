@@ -30,7 +30,7 @@ def get_molecule(molecule):
     with open('database.json', 'r') as f:
         db = json.load(f)
 
-    return molecule, db[molecule]
+    return molecule, db[molecule][0]
 
 
 if __name__ == '__main__':
