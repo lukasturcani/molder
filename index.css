@@ -104,7 +104,7 @@ p {
 
 .button_div {
     height: 100%;
-    width: 50%;
+    width: 33.33%;
     padding: 1%;
 }
 
@@ -126,6 +126,10 @@ p {
 #not_sure {
     background-color: blue;
 
+}
+
+#unclear {
+    background-color: blue;
 }
 
 

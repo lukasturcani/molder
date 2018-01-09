@@ -163,6 +163,17 @@ $(document).ready(function() {
             }
         }
 
+        if (key.which === 51) {
+
+            if (buttonsOn) {
+                if (historyIndex === 0) {
+                    previousMolecules.splice(0, 0, currentMolecule[0]);
+                }
+                historyIndex = 0;
+                sendOpinion(currentMolecule[0], 2);
+            }
+        }
+
     });
 
     /** Make clicking on buttons work. **/
@@ -184,6 +195,16 @@ $(document).ready(function() {
             }
             historyIndex = 0;
             sendOpinion(currentMolecule[0], 1);
+        }
+    });
+
+    $("#unclear").on("click touchstart", function() {
+        if (buttonsOn) {
+            if (historyIndex === 0) {
+                previousMolecules.splice(0, 0, currentMolecule[0]);
+            }
+            historyIndex = 0;
+            sendOpinion(currentMolecule[0], 2);
         }
     });
 
