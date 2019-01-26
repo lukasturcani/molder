@@ -1,6 +1,6 @@
 from flask import Blueprint, current_app
 import json
-from db import get_db
+from molder.db import get_db
 import numpy as np
 
 bp = Blueprint('molder', __name__)
@@ -22,14 +22,14 @@ def max_history_index(username):
 
     """
 
-    history_query = '''
-        SELECT MAX(history_index)
-        FROM results
-        WHERE
-           username = ?
-    '''
+    history_query = 'SELECT COUNT(*) FROM results WHERE username = ?'
+    index,  = get_db().execute(history_query, (username, )).fetchone()
+    return index - 1
 
-    return get_db().execute(history_query, (username, )).fetchone()
+
+@bp.route('/')
+def site():
+    return current_app.send_static_file('index.html')
 
 
 @bp.route('/mols/<username>/<int:history_index>', methods=('GET', ))
@@ -61,7 +61,8 @@ def get_historical_molecule(username, history_index):
             history_index = ?
     '''
 
-    mol = get_db().execute(query, username, history_index).fetchone()
+    db = get_db()
+    mol, = db.execute(query, (username, history_index)).fetchone()
     return json.dumps([mol, current_app.mols[mol]])
 
 
@@ -82,10 +83,10 @@ def get_history_index(username):
 
     """
 
-    return max_history_index(username)
+    return json.dumps(max_history_index(username))
 
 
-@bp.route('/opinions/<username>/<molecule>/<opinion>',
+@bp.route('/opinions/<username>/<path:molecule>/<opinion>',
           methods=('POST', ))
 def update_opinion(username, molecule, opinion):
     """
@@ -105,15 +106,33 @@ def update_opinion(username, molecule, opinion):
 
     Returns
     -------
-    None : :class:`NoneType`
+    :class:`str`
+        The updated opinion.
 
     """
 
-    h_index = max_history_index(username) + 1
     db = get_db()
-    db.execute('INSERT INTO results VALUES (?, ?, ?, ?)',
-               (username, molecule, opinion, h_index))
+
+    # Check if molecule already has an opinion registered.
+    query = '''
+        SELECT history_index
+        FROM results
+        WHERE
+            username = ? AND
+            molecule = ?
+    '''
+    result = db.execute(query, (username, molecule)).fetchone()
+    if result is None:
+        h_index = max_history_index(username) + 1
+    else:
+        h_index, = result
+
+    insert_cmd = '''
+        REPLACE INTO results VALUES (?, ?, ?, ?)
+    '''
+    db.execute(insert_cmd, (username, molecule, opinion, h_index))
     db.commit()
+    return opinion
 
 
 @bp.route('/mols/<username>/next', methods=('GET', ))
@@ -145,11 +164,14 @@ def next_molecule(username):
 
     # Add any shared molecules that the user has already seen.
     seen_query = 'SELECT molecule FROM results WHERE username = ?'
-    seen += {mol for mol, in db.execute(seen_query, (username, ))}
+    seen |= {mol for mol, in db.execute(seen_query, (username, ))}
 
     # Get available molecules.
-    db = {mol for mol in current_app.mols if mol not in seen}
+    db = list({mol for mol in current_app.mols if mol not in seen})
 
-    # Pick the next molecule at random from the available ones.
-    molecule = np.random.choice(list(db.keys()))
-    return json.dumps([molecule, current_app.mols[molecule]])
+    # Check that there are available molecules left.
+    if len(db):
+        molecule = np.random.choice(list(db))
+        return json.dumps([molecule, current_app.mols[molecule]])
+    else:
+        return json.dumps(["", ""])

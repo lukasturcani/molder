@@ -54,7 +54,7 @@ Files.
 ======
 
 :__init__.py: Sets up the flask app.
-:molder.py: Defines the app code.
+:site.py: Defines the app code.
 :db.py: Defines database code.
 :static/index.html: The website.
 :static/index.css: Styles the website.

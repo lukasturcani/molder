@@ -5,8 +5,7 @@
 from flask import Flask
 import os
 import json
-import molder
-import db
+from molder import db, site
 
 
 def create_app(instance_path=None, test_config=None):
@@ -46,18 +45,15 @@ def create_app(instance_path=None, test_config=None):
         os.makedirs(app.instance_path)
 
     # Load database.json and shared.json into memory.
-    with app.open_resource('database/database.json', 'rt') as f:
-        app.mols = json.load(f)
-    with app.open_resource('database/shared.json', 'rt') as f:
-        app.shared_mols = set(json.load(f))
+    with app.open_resource('database/database.json') as f:
+        app.mols = json.loads(f.read().decode('ascii'))
+    with app.open_resource('database/shared.json') as f:
+        app.shared_mols = set(json.loads(f.read().decode('ascii')))
 
     # Create the database if it does not yet exist.
-    db.init_db()
+    db.init_app(app)
 
     # Apply the molder blueprint to the app.
-    app.register_blueprint(molder.bp)
-
-    # Add database hooks to app.
-    db.init_app(app)
+    app.register_blueprint(site.bp)
 
     return app

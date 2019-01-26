@@ -24,9 +24,13 @@
  *
  * Used as a callback function for requests.
  */
-function requestListener() {
-    console.log(this.responseText);
+function requestListener(msg)
+{
+    function inner() { console.log(msg, this.responseText); }
+    return inner;
 }
+
+
 
 
 /**
@@ -41,7 +45,7 @@ function sendOpinion(username, molecule, opinion) {
     buttonsOn = false;
 
     let opinionRequest = new XMLHttpRequest();
-    opinionRequest.addEventListener("load", requestListener);
+    opinionRequest.addEventListener("load", requestListener('sendOpinion'));
 
     // Once the opinion is sent, ask the server to send back the
     // new historyIndex.
@@ -77,7 +81,7 @@ function nextMolecule(username)
     buttonsOn = false;
 
     let nextMolRequest = new XMLHttpRequest();
-    nextMolRequest.addEventListener("load", requestListener);
+    nextMolRequest.addEventListener("load", requestListener('nextMolecule'));
     nextMolRequest.addEventListener("load", updateState);
     nextMolRequest.open("GET", `/mols/${username}/next`);
     nextMolRequest.send();
@@ -95,7 +99,7 @@ function getHistoricalMolecule(username, historyIndex) {
     buttonsOn = false;
 
     let moleculeRequest = new XMLHttpRequest();
-    moleculeRequest.addEventListener("load", requestListener);
+    moleculeRequest.addEventListener("load", requestListener('getHistoricalMolecule'));
     moleculeRequest.addEventListener("load", updateState);
     moleculeRequest.open("GET", `/mols/${username}/${historyIndex}`);
     moleculeRequest.send();
@@ -118,10 +122,10 @@ function updateHistoryIndex() {
  */
 function getMaxHistoryIndex(username) {
     let indexRequest = new XMLHttpRequest();
-    initRequest.addEventListener("load", requestListener);
-    initRequest.addEventListener("load", updateHistoryIndex);
-    initRequest.open("GET", `/history_indices/${username}`);
-    initRequest.send();
+    indexRequest.addEventListener("load", requestListener('getMaxHistoryIndex'));
+    indexRequest.addEventListener("load", updateHistoryIndex);
+    indexRequest.open("GET", `/history_indices/${username}`);
+    indexRequest.send();
 }
 
 /**
@@ -152,11 +156,7 @@ $(document).ready(function() {
 
     $(document).keydown(function(key) {
         if (key.which === 49) {
-
             if (buttonsOn) {
-                if (historyIndex === 0) {
-                    previousMolecules.splice(0, 0, currentMolecule[0]);
-                }
                 historyIndex = 0;
                 sendOpinion(username, molInchi, 0);
                 nextMolecule(username);
@@ -164,11 +164,7 @@ $(document).ready(function() {
         }
 
         if (key.which === 50) {
-
             if (buttonsOn) {
-                if (historyIndex === 0) {
-                    previousMolecules.splice(0, 0, currentMolecule[0]);
-                }
                 historyIndex = 0;
                 sendOpinion(username, molInchi, 1);
                 nextMolecule(username);
@@ -181,9 +177,6 @@ $(document).ready(function() {
 
     $("#no").on("click touchstart", function() {
         if (buttonsOn) {
-            if (historyIndex === 0) {
-                previousMolecules.splice(0, 0, currentMolecule[0]);
-            }
             ++historyIndex;
             sendOpinion(username, molInchi, 'not synthesizable');
             nextMolecule(username);
@@ -192,9 +185,6 @@ $(document).ready(function() {
 
     $("#yes").on("click touchstart", function() {
         if (buttonsOn) {
-            if (historyIndex === 0) {
-                previousMolecules.splice(0, 0, currentMolecule[0]);
-            }
             ++historyIndex;
             sendOpinion(username, molInchi, 'synthesizable');
             nextMolecule(username);
@@ -202,8 +192,8 @@ $(document).ready(function() {
     });
 
     $("#back").on("click touchstart", function() {
-        if (buttonsOn and historyIndex >= 0) {
-            getHistoricalMolecule(historyIndex);
+        if (buttonsOn && historyIndex >= 0) {
+            getHistoricalMolecule(username, historyIndex);
             --historyIndex;
         }
     });

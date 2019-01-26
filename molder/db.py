@@ -9,17 +9,17 @@ def get_db():
     return g.db
 
 
-def close_db():
+def close_db(e=None):
     db = g.pop('db', None)
     if db is not None:
         db.close()
 
 
-def init_db():
+def init_app(app):
 
-    current_app.teardown_appcontext(close_db)
+    app.teardown_appcontext(close_db)
 
-    if os.path.exists(current_app.config['DATABASE']):
+    if os.path.exists(app.config['DATABASE']):
         return
 
     cmd = '''
@@ -28,10 +28,11 @@ def init_db():
             molecule TEXT,
             opinion TEXT,
             history_index INTEGER,
-            PRIMARY KEY (username, molecule)
+            PRIMARY KEY (username, molecule),
+            UNIQUE (username, history_index)
         )
     '''
 
-    db = get_db()
+    db = sqlite3.connect(app.config['DATABASE'])
     db.execute(cmd)
     db.commit()
