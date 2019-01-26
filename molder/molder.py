@@ -85,36 +85,6 @@ as necessary for the chosen algo.
 """
 
 
-import cgi
-from os.path import join
-import json
-import numpy as np
-from glob import iglob
-
-
-def update_history(username, history):
-    """
-    Writes `history` to the user's ``history.json`` file.
-
-    Parameters
-    ----------
-    username : :class:`str`
-        The username of the person sending the request.
-
-    history : :class:`list` of :class:`str`
-        A list holding the InChI's of molecules previously seen by
-        the user.
-
-    Returns
-    -------
-    None : :class:`NoneType`
-
-    """
-
-    with open(join(username, 'history.json'), 'w') as f:
-        json.dump(history, f)
-
-
 @bp.route('/opinions/<username>/<molecule>/<opinion>',
           methods=('POST', ))
 def update_opinion(username, molecule, opinion):
