@@ -1,5 +1,91 @@
 #!/home/lukas/anaconda3/bin/python3.6
 """
+Returns the structural info of a molecule to the client.
+
+"""
+
+import json
+
+
+def get_molecule(molecule):
+    """
+    Returns the structural info of `molecule`.
+
+    Parameters
+    ----------
+    molecule : :class:`str`
+        The InChI of a molecule which the client wants the structure
+        of.
+
+    Returns
+    -------
+    :class:`tuple` of :class:`str`
+        The first string is the InChI of the molecule, same as
+        `molecule`, the second string is the structure of the molecule
+        in the form of a MDL V3000 .mol file.
+
+    """
+
+    with open('database.json', 'r') as f:
+        db = json.load(f)
+
+    return molecule, db[molecule]
+
+
+if __name__ == '__main__':
+    form = cgi.FieldStorage()
+    molecule = form.getfirst('molecule')
+
+    print('Content-Type: text/plain\n')
+    print(json.dumps(get_molecule(molecule)))
+
+
+#!/home/lukas/anaconda3/bin/python3.6
+"""
+Sends user their previous history and first molecule of the session.
+
+"""
+
+import cgi
+import json
+import os
+
+
+if __name__ == '__main__':
+    # Import "next_molecule" from next_mol.cgi.
+    gvars = {}
+    with open('next_mol.cgi', 'r') as f:
+        exec(f.read(), gvars)
+    next_molecule = gvars['next_molecule']
+
+    form = cgi.FieldStorage()
+    username = form.getfirst('username')
+
+    with open('database.json', 'r') as f:
+        db = json.load(f)
+
+    # If the user already used the app.
+    if os.path.exists(username):
+        with open(os.path.join(username, 'history.json'), 'r') as f:
+            history = json.load(f)
+        next_mol = next_molecule(username)
+
+    # If this is a new user.
+    else:
+        history = []
+        next_mol = next_molecule(username)
+        os.mkdir(username)
+        with open(os.path.join(username, 'history.json'), 'w') as f:
+            json.dump(history, f)
+        with open(os.path.join(username, 'opinions.json'), 'w') as f:
+            json.dump({}, f)
+
+    print('Content-Type: text/plain\n')
+    print(json.dumps((history, next_mol)))
+
+
+#!/home/lukas/anaconda3/bin/python3.6
+"""
 Saves data from client and sends back the next molecule.
 
 If a different algorithm for selecting the next molecule is to be used
