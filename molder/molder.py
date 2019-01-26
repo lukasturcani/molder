@@ -1,88 +1,88 @@
 from flask import Blueprint, current_app
 import json
 from db import get_db
+import numpy as np
 
 bp = Blueprint('molder', __name__)
 
 
-@bp.route('/mol/<molecule>', methods=('GET', ))
-def get_molecule(molecule):
+def max_history_index(username):
     """
-    Returns the structural info of `molecule`.
+    Returns the maximum history index of a user.
 
     Parameters
     ----------
-    molecule : :class:`str`
-        The InChI of a molecule which the client wants the structure
-        of.
+    username : :class:`str`
+        The name of a user whose history index is needed.
+
+    Returns
+    -------
+    :class:`int`
+        The maximum history index of a user.
+
+    """
+
+    history_query = '''
+        SELECT MAX(history_index)
+        FROM results
+        WHERE
+           username = ?
+    '''
+
+    return get_db().execute(history_query, (username, )).fetchone()
+
+
+@bp.route('/mols/<username>/<int:history_index>', methods=('GET', ))
+def get_historical_molecule(username, history_index):
+    """
+    Returns the structural info of a molecule from the user's history.
+
+    Parameters
+    ----------
+    username : :class:`str`, optional
+        The username of the user.
+
+    history_index : :class:`int`
+        The history index of the molecule for that user.
 
     Returns
     -------
     :class:`str`
-        The structure of the molecule in the form of a MDL V3000
-        ``.mol`` file.
+        A JSON array holding the InChI of the molecule and its
+        structure, respectively.
 
     """
 
-    return current_app.mols[molecule]
+    query = '''
+        SELECT molecule
+        FROM results
+        WHERE
+            username = ? AND
+            history_index = ?
+    '''
+
+    mol = get_db().execute(query, username, history_index).fetchone()
+    return json.dumps([mol, current_app.mols[mol]])
 
 
-#!/home/lukas/anaconda3/bin/python3.6
-"""
-Sends user their previous history and first molecule of the session.
+@bp.route('/history_indices/<username>', methods=('GET', ))
+def get_history_index(username):
+    """
+    Get the maximum history index for a user.
 
-"""
+    Parameters
+    ----------
+    username : :class:`str`
+        The username of the user whose history index is needed.
 
-import cgi
-import json
-import os
+    Returns
+    -------
+    :class:`int`
+        The user's maximum history index.
 
+    """
 
-if __name__ == '__main__':
-    # Import "next_molecule" from next_mol.cgi.
-    gvars = {}
-    with open('next_mol.cgi', 'r') as f:
-        exec(f.read(), gvars)
-    next_molecule = gvars['next_molecule']
-
-    form = cgi.FieldStorage()
-    username = form.getfirst('username')
-
-    with open('database.json', 'r') as f:
-        db = json.load(f)
-
-    # If the user already used the app.
-    if os.path.exists(username):
-        with open(os.path.join(username, 'history.json'), 'r') as f:
-            history = json.load(f)
-        next_mol = next_molecule(username)
-
-    # If this is a new user.
-    else:
-        history = []
-        next_mol = next_molecule(username)
-        os.mkdir(username)
-        with open(os.path.join(username, 'history.json'), 'w') as f:
-            json.dump(history, f)
-        with open(os.path.join(username, 'opinions.json'), 'w') as f:
-            json.dump({}, f)
-
-    print('Content-Type: text/plain\n')
-    print(json.dumps((history, next_mol)))
-
-
-#!/home/lukas/anaconda3/bin/python3.6
-"""
-Saves data from client and sends back the next molecule.
-
-If a different algorithm for selecting the next molecule is to be used
-:func:`next_molecule` will need to be changed. The only requirement is
-that it returns a tuple consisting of two strings. The first string is
-the InChI of the next molecule and the second string is the structure
-of the next molecule (V3000 .mol file format). Arguments can be changed
-as necessary for the chosen algo.
-
-"""
+    return max_history_index(username)
 
 
 @bp.route('/opinions/<username>/<molecule>/<opinion>',
@@ -109,21 +109,14 @@ def update_opinion(username, molecule, opinion):
 
     """
 
+    h_index = max_history_index(username) + 1
     db = get_db()
-
-    history_query = '''
-        SELECT MAX(history_index)
-        FROM results
-        WHERE
-           username = ?
-    '''
-    history_index = db.execute(history_query, (username, )).fetchone()
-    history_index += 1
-
     db.execute('INSERT INTO results VALUES (?, ?, ?, ?)',
-               (username, molecule, opinion, history_index))
+               (username, molecule, opinion, h_index))
+    db.commit()
 
 
+@bp.route('/mols/<username>/next', methods=('GET', ))
 def next_molecule(username):
     """
     Returns the next molecule to be judged by the user.
@@ -135,50 +128,28 @@ def next_molecule(username):
 
     Returns
     -------
-    :class:`tuple` of :class:`str`
-        The first string is InChI of the next molecule the client will
-        render. The second string is the structural info of the
-        molecule.
+    :class:`str`
+        A JSON array holding the InChI and structure of the next
+        molecule, respectively.
 
     """
 
-    # Load the set of shared molecules that every user sees.
-    with open('shared.json', 'r') as f:
-        shared = set(json.load(f))
+    db = get_db()
 
     # Make a set of all molecules judged by all users. This will
-    # ensure that each user looks at unique molecules.
-    seen = set()
-    for path in iglob('*/history.json'):
-        with open(path, 'r') as f:
-            history = json.load(f)
-            # If looking at the molecules judges by other users, ignore
-            # the fact that they've already looked at shared molecules.
-            if username not in path:
-                history = (mol for mol in history if mol not in shared)
-            seen.update(history)
+    # ensure that each user looks at unique molecules. Make sure
+    # to exclude shared molecules which are to be seen by all users.
+    seen_query = 'SELECT molecule FROM results'
+    seen = {mol for mol, in db.execute(seen_query)
+            if mol not in current_app.shared_mols}
 
-    # Load molecules in the database, excluding the ones already seen.
-    with open('database.json', 'r') as f:
-        db = json.load(f)
-        db = {key: value for key, value in db.items() if
-              key not in seen}
+    # Add any shared molecules that the user has already seen.
+    seen_query = 'SELECT molecule FROM results WHERE username = ?'
+    seen += {mol for mol, in db.execute(seen_query, (username, ))}
+
+    # Get available molecules.
+    db = {mol for mol in current_app.mols if mol not in seen}
 
     # Pick the next molecule at random from the available ones.
-    chosen_key = np.random.choice(list(db.keys()))
-    # Go through the database in order.
-    return chosen_key, db[chosen_key]
-
-
-if __name__ == '__main__':
-    form = cgi.FieldStorage()
-    username = form.getfirst('username')
-    history = json.loads(form.getfirst('history'))
-    molecule = form.getfirst('molecule')
-    opinion = int(form.getfirst('opinion'))
-
-    update_history(username, history)
-    update_opinions(username, molecule, opinion)
-
-    print('Content-Type: text/plain\n')
-    print(json.dumps(next_molecule(username)))
+    molecule = np.random.choice(list(db.keys()))
+    return json.dumps([molecule, current_app.mols[molecule]])

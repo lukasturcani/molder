@@ -3,17 +3,13 @@
  *
  * There are a couple of globals which determine the state.
  *
- * previousMolecules - array of strings - Each string is the InChI of a
- * molecule previously seen by the user. Most recent first.
+ * molInchi- The inchi of the molecule currently being viewed.
  *
- * currentMolecule - array of 2 strings - The first string is the
- * InChI of the molecule currently being viewed. The second string is
- * its structure. The structure is represented using the V3000 .mol
- * file format.
+ * molStructure - The structure of the molecule currently being viewed.
+ * The structure is represented using the V3000 .mol format.
  *
- * historyIndex - int - Keeps track of how many times the user pressed
- * ``back`` button in a row. Reset to 0 every time one of the other
- * buttones is pressed.
+ * historyIndex - int - Keeps track of how many molecules the user has
+ * viewed.
  *
  * buttonsOn - bool - A switch which prevents buttons from sending
  * multiple requests to the server. Causes the buttons to stop
@@ -32,20 +28,6 @@ function requestListener() {
     console.log(this.responseText);
 }
 
-/**
- * A callback function for ``sendOpinion`` and ``getMolecule``.
- *
- * When the server sends back the structure of the next molecule to be
- * rendered, this function is run. It updates ``currentMolecule`` and
- * renders the new molecule.
- */
-function updateState() {
-    currentMolecule = JSON.parse(this.responseText);
-    viewer.loadMoleculeStr(undefined, currentMolecule[1]);
-    // Allow new requests to be sent.
-    buttonsOn = true;
-}
-
 
 /**
  * Communicates with the server when a button is pressed, excluding ``back``.
@@ -54,21 +36,51 @@ function updateState() {
  * previously seen molecules. Creates a callback for when the server
  * sends back the next molecule to render.
  */
-function sendOpinion(molecule, opinion) {
+function sendOpinion(username, molecule, opinion) {
     // Don't allow any new requests until this one is complete.
     buttonsOn = false;
 
-    var formData = new FormData();
-    formData.append("username", username);
-    formData.append("molecule", molecule);
-    formData.append("opinion", opinion);
-    formData.append("history", JSON.stringify(previousMolecules));
-
-    var opinionRequest = new XMLHttpRequest();
+    let opinionRequest = new XMLHttpRequest();
     opinionRequest.addEventListener("load", requestListener);
-    opinionRequest.addEventListener("load", updateState);
-    opinionRequest.open("POST", "next_mol.cgi");
-    opinionRequest.send(formData);
+
+    // Once the opinion is sent, ask the server to send back the
+    // new historyIndex.
+    let updateHistoryIndexRequest = () => getMaxHistoryIndex(username);
+    opinionRequest.addEventListener("load", updateHistoryIndexRequest);
+
+    let url = `/opinions/${username}/${molecule}/${opinion}`;
+    opinionRequest.open("POST", url);
+    opinionRequest.send();
+}
+
+
+/**
+ * A callback function for ``nextMolecule`` and ``getMolecule``.
+ *
+ * When the server sends back the structure of the next molecule to be
+ * rendered, this function is run. It updates ``currentMolecule`` and
+ * renders the new molecule.
+ */
+function updateState() {
+    [molInchi, molStructure] = JSON.parse(this.responseText);
+    viewer.loadMoleculeStr(undefined, molStructure);
+    // Allow new requests to be sent.
+    buttonsOn = true;
+}
+
+
+/**
+ * Requests the next unseen molecule to render from the server.
+ */
+function nextMolecule(username)
+{
+    buttonsOn = false;
+
+    let nextMolRequest = new XMLHttpRequest();
+    nextMolRequest.addEventListener("load", requestListener);
+    nextMolRequest.addEventListener("load", updateState);
+    nextMolRequest.open("GET", `/mols/${username}/next`);
+    nextMolRequest.send();
 }
 
 
@@ -78,59 +90,57 @@ function sendOpinion(molecule, opinion) {
  * Tells the server the InChI of one of the previous molecules and
  * asks it to return its structure, which is rendered by the callback.
  */
-function getMolecule(molecule) {
+function getHistoricalMolecule(username, historyIndex) {
     // Don't allow any new requests until this one is complete.
     buttonsOn = false;
 
-    var formData = new FormData();
-    formData.append("molecule", molecule);
-
-    var moleculeRequest = new XMLHttpRequest();
+    let moleculeRequest = new XMLHttpRequest();
     moleculeRequest.addEventListener("load", requestListener);
     moleculeRequest.addEventListener("load", updateState);
-    moleculeRequest.open("GET", `/mol/${molecule}`);
+    moleculeRequest.open("GET", `/mols/${username}/${historyIndex}`);
     moleculeRequest.send();
 
 }
 
 
 /**
- * A callback for the ``init`` function.
+ * Updates the historyIndex variable.
  *
- * When the server returns the molecules previously seen by the user
- * and the molecule which should be rendered, this function saves the
- * data and renders the molecule.
+ * This is a callback for getMaxHistoryIndex.
  */
-function initCallback() {
-    [previousMolecules, currentMolecule] = JSON.parse(this.responseText);
-    viewer.loadMoleculeStr(undefined, currentMolecule[1]);
-    // Allow requests to be sent to the server.
-    buttonsOn = true;
+function updateHistoryIndex() {
+    historyIndex = JSON.parse(this.responseText);
 }
 
 
 /**
- * Asks the server to return any molecules previously seen by the user.
- *
- * Also asks it for the first molecule to be viewed in this session.
+ * Asks for the maximum history index the user has.
  */
-function init() {
-    var formData = new FormData();
-    formData.append("username", username);
-
-    var initRequest = new XMLHttpRequest();
+function getMaxHistoryIndex(username) {
+    let indexRequest = new XMLHttpRequest();
     initRequest.addEventListener("load", requestListener);
-    initRequest.addEventListener("load", initCallback);
-    initRequest.open("POST", "init_state.cgi");
-    initRequest.send(formData);
+    initRequest.addEventListener("load", updateHistoryIndex);
+    initRequest.open("GET", `/history_indices/${username}`);
+    initRequest.send();
 }
 
+/**
+ * Intializes the state when the app is first loaded.
+ */
+function init()
+{
+    getMaxHistoryIndex(username);
+    nextMolecule(username);
+}
 
 /*** End of function declarations. ***/
 
 
-var viewer, previousMolecules, currentMolecule;
-var historyIndex = 0;
+var viewer;
+// Holds the Inchi and 3D structure of the molecule, respectively.
+var molInchi = undefined;
+var molStructure = undefined;
+var historyIndex = undefined;
 var buttonsOn = false;
 var username = prompt("Username (can be anything)");
 
@@ -148,7 +158,8 @@ $(document).ready(function() {
                     previousMolecules.splice(0, 0, currentMolecule[0]);
                 }
                 historyIndex = 0;
-                sendOpinion(currentMolecule[0], 0);
+                sendOpinion(username, molInchi, 0);
+                nextMolecule(username);
             }
         }
 
@@ -159,7 +170,8 @@ $(document).ready(function() {
                     previousMolecules.splice(0, 0, currentMolecule[0]);
                 }
                 historyIndex = 0;
-                sendOpinion(currentMolecule[0], 1);
+                sendOpinion(username, molInchi, 1);
+                nextMolecule(username);
             }
         }
 
@@ -172,8 +184,9 @@ $(document).ready(function() {
             if (historyIndex === 0) {
                 previousMolecules.splice(0, 0, currentMolecule[0]);
             }
-            historyIndex = 0;
-            sendOpinion(currentMolecule[0], 0);
+            ++historyIndex;
+            sendOpinion(username, molInchi, 'not synthesizable');
+            nextMolecule(username);
         }
     });
 
@@ -182,15 +195,16 @@ $(document).ready(function() {
             if (historyIndex === 0) {
                 previousMolecules.splice(0, 0, currentMolecule[0]);
             }
-            historyIndex = 0;
-            sendOpinion(currentMolecule[0], 1);
+            ++historyIndex;
+            sendOpinion(username, molInchi, 'synthesizable');
+            nextMolecule(username);
         }
     });
 
     $("#back").on("click touchstart", function() {
-        if (buttonsOn && historyIndex < previousMolecules.length) {
-            getMolecule(previousMolecules[historyIndex]);
-            historyIndex++;
+        if (buttonsOn and historyIndex >= 0) {
+            getHistoricalMolecule(historyIndex);
+            --historyIndex;
         }
     });
 

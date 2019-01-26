@@ -56,7 +56,6 @@ Files.
 :__init__.py: Sets up the flask app.
 :molder.py: Defines the app code.
 :db.py: Defines database code.
-:schema.sql: Defines the schema of the results database.
 :static/index.html: The website.
 :static/index.css: Styles the website.
 :static/index.js: Makes the website interactive. Handles communication with

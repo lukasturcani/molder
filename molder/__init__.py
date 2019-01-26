@@ -33,6 +33,8 @@ def create_app(instance_path=None, test_config=None):
                 instance_relative_config=True)
 
     if test_config is None:
+        # Load default config values.
+        app.config.from_object('molder.default_settings')
         # Load the instance config, if it exists, when not testing.
         app.config.from_pyfile('config.py', silent=True)
     else:
@@ -50,9 +52,7 @@ def create_app(instance_path=None, test_config=None):
         app.shared_mols = set(json.load(f))
 
     # Create the database if it does not yet exist.
-    db_path = os.path.join(app.instance_path, 'results.sql')
-    if not os.path.exists(db_path):
-        db.init_database(db_path)
+    db.init_db()
 
     # Apply the molder blueprint to the app.
     app.register_blueprint(molder.bp)
