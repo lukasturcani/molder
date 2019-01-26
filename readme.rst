@@ -4,8 +4,8 @@
 Introduction.
 =============
 
-Molder is a data collection website for molecules. When hosted on a
-server, it looks like this:
+Molder is a data collection website for molecules. When hosted, it
+looks like this:
 
 .. image:: pictures/molder.png
 
@@ -23,69 +23,52 @@ this to work, however.
 
 .. image:: pictures/desktop_request.png
 
+The project is written in flask.
 
-How it works.
-=============
+How do I use Molder for my project?
+===================================
 
-On loading the website the user is asked to give a username. This
-allows the user to pick up from where they left off on a different
-machine. For each user, the server creates a folder with the same name.
-In this folder two files are held for each user. The first,
-``history.json``, stores the InChI keys of molecules previously seen by
-the user in an array. The second, ``opinions.json``, stores the ratings
-the user gave to molecules. The storage is done in a dictionary where
-the key is the InChI of the molecule and value corresponds to the
-button pressed.
+Deploy it like any other flask app.
 
-When the user presses a button a request is sent to the server. The
-request delivers the molecule and button pressed. A server-side
-Python script, ``next_mol.cgi``, stores this data in ``opinions.json``
-in the user's directory. The script then selects the next molecule in
-``database.json`` to be shown to the user. This script needs to be
-modified if the order or algorithm through which molecules are
-presented to users is to be changed. See the ``next_mol.cgi`` for more
-details. Note that users can also press buttons ``1``, ``2`` etc. to
-select the appropriate button.
+Molder looks at the file ``database/database.json``, which contains a
+number of molecular structures. Users accessing the site will be sent
+the structures in this file and when they click a button their
+response will be sent back to the server and saved.
 
-By default, different users will not see the same molecules from
-``database.json``. To make a set of molecules seen by all users,
-create a file called ``shared.json``. It will hold a ``.json`` list of
-InChI's belonging to molecules in ``database.json``. These molecules
-will be seen by all users.
+The server will send each structure in ``database/databse.json`` to a
+single user only, unless the structure is also listed in
+``database/shared.json``. If this is the case, then the structure will
+be seen by all users.
 
+To make users see your molecules, simply replace the files
+``database.json`` and ``shared.json`` with your own.
+
+To change the question and modify the buttons, including adding or
+removing them, change ``static/index.html`` and ``static/index.js``.
+
+The server will save the results into a database called ``results.sql``
+which holds a single table with the columns ``username``, ``molecule``
+and ``opinion``.
 
 Files.
 ======
 
-:database.json: Holds the database of molecules which are to be
-                evaluated by users. The molecules are stored as a
-                dictionary where the key is the InChI of the molecule
-                and the value is the structural info of the molecule.
-                The structural info is the content of a V3000 ``.mol``
-                file of the molecule. The content of other molecular
-                structure files may work as well, but they're not
-                tested.
-:shared.json: Holds a list of InChIs belonging to molecules in
-              ``database.json``. Molecules in this list will be seen
-              by all users.
-:index.html: The website.
-:index.css: Styles the website.
-:index.js: Makes the website interactive. Handles communication with
-           the server.
-:init_state.cgi: A server-side Python script. This script is run when
-                 the user first loads the website. It initializes the
-                 session by loading the history of the user (so they
-                 can use the ``back`` button) and sends them their
-                 first molecule of the session.
-:next_mol.cgi: A server-side Python script. This script is invoked
-               every time the user presses a button, excluding
-               ``back``. The script saves the molecule and button
-               pressed on the server and sends the user their next
-               molecule.
-:get_mol.cgi: A server-side Python script. Each time the ``back``
-              button is pressed the user sends a request to the
-              server. The server runs this script,  which looks at
-              sends back the structural info the molecule the user
-              requested.
-:colors.html: Gives the name of each element and the corresponding
-              color.
+:__init__.py: Sets up the flask app.
+:molder.py: Defines the app code.
+:db.py: Defines database code.
+:schema.sql: Defines the schema of the results database.
+:static/index.html: The website.
+:static/index.css: Styles the website.
+:static/index.js: Makes the website interactive. Handles communication with
+                  the server.
+:static/colors.html: Gives the name of each element and the corresponding
+                     color.
+:database/database.json: Holds the database of molecules which are to be
+                         evaluated by users. The molecules are stored as a
+                         dictionary where the key is the InChI of the molecule
+                         and the value is the structural info of the molecule.
+                         The structural info is the content of a V3000 ``.mol``
+                         file of the molecule.
+:database/shared.json: Holds a list of InChIs belonging to molecules in
+                       ``database.json``. Molecules in this list will be seen
+                       by all users.

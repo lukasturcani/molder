@@ -88,8 +88,8 @@ function getMolecule(molecule) {
     var moleculeRequest = new XMLHttpRequest();
     moleculeRequest.addEventListener("load", requestListener);
     moleculeRequest.addEventListener("load", updateState);
-    moleculeRequest.open("POST", "get_mol.cgi");
-    moleculeRequest.send(formData);
+    moleculeRequest.open("GET", `/mol/${molecule}`);
+    moleculeRequest.send();
 
 }
 

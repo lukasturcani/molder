@@ -1,12 +1,11 @@
-#!/home/lukas/anaconda3/bin/python3.6
-"""
-Returns the structural info of a molecule to the client.
-
-"""
-
+from flask import Blueprint, current_app
 import json
+from db import get_db
+
+bp = Blueprint('molder', __name__)
 
 
+@bp.route('/mol/<molecule>', methods=('GET', ))
 def get_molecule(molecule):
     """
     Returns the structural info of `molecule`.
@@ -19,25 +18,13 @@ def get_molecule(molecule):
 
     Returns
     -------
-    :class:`tuple` of :class:`str`
-        The first string is the InChI of the molecule, same as
-        `molecule`, the second string is the structure of the molecule
-        in the form of a MDL V3000 .mol file.
+    :class:`str`
+        The structure of the molecule in the form of a MDL V3000
+        ``.mol`` file.
 
     """
 
-    with open('database.json', 'r') as f:
-        db = json.load(f)
-
-    return molecule, db[molecule]
-
-
-if __name__ == '__main__':
-    form = cgi.FieldStorage()
-    molecule = form.getfirst('molecule')
-
-    print('Content-Type: text/plain\n')
-    print(json.dumps(get_molecule(molecule)))
+    return current_app.mols[molecule]
 
 
 #!/home/lukas/anaconda3/bin/python3.6
@@ -128,9 +115,11 @@ def update_history(username, history):
         json.dump(history, f)
 
 
-def update_opinions(username, molecule, opinion):
+@bp.route('/opinions/<username>/<molecule>/<opinion>',
+          methods=('POST', ))
+def update_opinion(username, molecule, opinion):
     """
-    Updates the user's ``opinions.json`` file.
+    Updates the results database with the users opinion.
 
     Parameters
     ----------
@@ -141,9 +130,8 @@ def update_opinions(username, molecule, opinion):
         The InChI of the molecule about which the user is sending their
         opinion.
 
-    opinion : :class:`int`
-        The user's opinion about `molecule`. The number corresponds to
-        a button pressed on the website.
+    opinion : :class:`str`
+        The user's opinion about `molecule`.
 
     Returns
     -------
@@ -151,12 +139,19 @@ def update_opinions(username, molecule, opinion):
 
     """
 
-    with open(join(username, 'opinions.json'), 'r') as f:
-        opinions = json.load(f)
+    db = get_db()
 
-    opinions[molecule] = opinion
-    with open(join(username, 'opinions.json'), 'w') as f:
-        json.dump(opinions, f)
+    history_query = '''
+        SELECT MAX(history_index)
+        FROM results
+        WHERE
+           username = ?
+    '''
+    history_index = db.execute(history_query, (username, )).fetchone()
+    history_index += 1
+
+    db.execute('INSERT INTO results VALUES (?, ?, ?, ?)',
+               (username, molecule, opinion, history_index))
 
 
 def next_molecule(username):
